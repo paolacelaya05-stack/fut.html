@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VisoríaFC - Grupo 502</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: system-ui, sans-serif; background: #eef2f5; padding: 12px; color: #1f2937; }
+        .app { max-width: 480px; margin: auto; }
+        .panel { background: #fff; padding: 14px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #d1d5db; }
+        h3 { color: #0f5132; margin-bottom: 10px; font-size: 1.1rem; }
+        input, select, button { width: 100%; padding: 9px; margin-bottom: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 14px; }
+        button { background: #0f5132; color: #fff; border: none; font-weight: bold; cursor: pointer; }
+        .ficha { background: #fff; padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #0f5132; font-size: 13px; }
+        .stats { display: flex; justify-content: space-between; margin-top: 6px; font-weight: bold; color: #374151; }
+    </style>
+</head>
+<body>
+<div class="app">
+    <div class="panel">
+        <h3>⚽ VisoríaFC: Ficha de Prospecto</h3>
+        <input type="text" id="jugador" placeholder="Nombre del jugador">
+        <select id="posicion">
+            <option value="Defensa">Defensa</option>
+            <option value="Mediocampista">Mediocampista</option>
+            <option value="Delantero">Delantero</option>
+            <option value="Portero">Portero</option>
+        </select>
+        <input type="number" id="goles" placeholder="Goles / Intercepciones" min="0">
+        <input type="number" id="minutos" placeholder="Minutos jugados" min="0">
+        <button onclick="guardarFicha()">Registrar Prospecto</button>
+    </div>
+    <div id="fichasLista"></div>
+</div>
+<script>
+    const CLAVE_VFC = "visoria_fc_502";
+
+    function obtenerFichas() {
+        return JSON.parse(localStorage.getItem(CLAVE_VFC)) || [];
+    }
+
+    function guardarFicha() {
+        const jugador = document.getElementById("jugador").value.trim();
+        const posicion = document.getElementById("posicion").value;
+        const goles = parseInt(document.getElementById("goles").value, 10);
+        const minutos = parseInt(document.getElementById("minutos").value, 10);
+
+        if (!jugador || isNaN(goles) || isNaN(minutos) || goles < 0 || minutos < 0) {
+            alert("Completa los datos del prospecto con valores válidos.");
+            return;
+        }
+
+        const fichas = obtenerFichas();
+        fichas.push({ jugador, posicion, goles, minutos });
+        localStorage.setItem(CLAVE_VFC, JSON.stringify(fichas));
+
+        document.getElementById("jugador").value = "";
+        document.getElementById("goles").value = "";
+        document.getElementById("minutos").value = "";
+        mostrarFichas();
+    }
+
+    function mostrarFichas() {
+        const cont = document.getElementById("fichasLista");
+        const fichas = obtenerFichas();
+        cont.innerHTML = fichas.map(f =>
+            `<div class="ficha">
+                <strong>${f.jugador}</strong> — <span>${f.posicion}</span>
+                <div class="stats">
+                    <span>Acción/Gol: ${f.goles}</span>
+                    <span>Min: ${f.minutos}'</span>
+                </div>
+            </div>`
+        ).join("");
+    }
+
+    document.addEventListener("DOMContentLoaded", mostrarFichas);
+</script>
+</body>
+</html>
